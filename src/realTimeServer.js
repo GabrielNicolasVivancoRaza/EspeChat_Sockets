@@ -9,21 +9,35 @@ module.exports = (httpServer) => { //configurar si peticiones http request o res
     const io = new Server(httpServer); //creamos el servidor de socket io, le pasamos el servidor http para que se conecte a el
     //a traves de la constante podemos accerder a la clase 
     //en el nombre de la clase server() es el constructor 
-    io.on('connection', socket => {
+    io.on('connection', (socket) => {
         //cada socket que se habilita es una conexion, cada vez que se conecta un cliente se ejecuta esta funcion, el socket es la conexion del cliente
         //cada usuario tiene un socket unico, con un identificador. Vamos a mostrar por la terminal el identificador de cada socket
         // console.log('Nuevo cliente conectado', socket.id);
         //socket es lo que permite la conexion, un enlace de comunicacion
         socket.on('message', (message) => {
-            const cookie = socket.request.headers.cookie; 
-            const user = cookie.split('=').pop();
+            const cookie = socket.request.headers.cookie || '';
+            const user = cookie.split('=').pop() || 'Anónimo';
 
-            io.emit('message', { //esto es para enviar el mensaje a todos los clientes conectados, esto es necesario para que todos los clientes puedan recibir el mensaje, esto es necesario para que todos los clientes puedan manejar la comunicacion en tiempo real en la aplicacion
-                user: "Gabo",
+            io.emit('message', { //esto es para enviar el mensaje a todos los clientes conectados
+                user,
                 message, 
-                date: new Date().getDay()
+                date: new Date().toLocaleTimeString()
             }) 
 
+        });
+
+        // Evento para cuando el usuario comienza a escribir
+        socket.on('typing', () => {
+            const cookie = socket.request.headers.cookie || '';
+            const user = cookie.split('=').pop() || 'Anónimo';
+            
+            // Enviar a todos EXCEPTO al que lo emite (broadcast)
+            socket.broadcast.emit('userTyping', { user });
+        });
+
+        // Evento para cuando el usuario deja de escribir
+        socket.on('stopTyping', () => {
+            socket.broadcast.emit('userStopTyping');
         });
         
     })

@@ -8,6 +8,7 @@ const router = express.Router();
 
 const path = require('path'); //ruta raiz dentro de src
 //ya esta listo el sistema de rutas de express 
+const isLoggedIn = require("../middleware/isLoggedIn");
 
 const views = path.join(__dirname, '/../views'); 
 

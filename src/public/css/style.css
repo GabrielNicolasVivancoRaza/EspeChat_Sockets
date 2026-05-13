@@ -41,6 +41,8 @@ button:not(:disabled) {
     background-color 0.15s ease-in-out,
     border-color 0.15s ease-in-out,
     box-shadow 0.15s ease-in-out;
+  color: var(--btn-color);
+  background-color: var(--btn-bg);
 }
 
 .btn:hover {
@@ -72,11 +74,28 @@ button:not(:disabled) {
   --btn-hover-border-color: #ffd700;
   --btn-focus-shadow-rgb: 0, 102, 51; /* Verde institucional en sombra */
   --btn-active-color: #ffffff;
-  --btn-active-bg: #004422; /* Verde más oscuro para activo */
+  --btn-active-bg: #004422; /* Verde más oscuro */
   --btn-active-border-color: #004422;
   --btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
   --btn-disabled-color: #ffffff;
   --btn-disabled-bg: #cccccc; /* Gris para deshabilitado */
+  --btn-disabled-border-color: #cccccc;
+}
+
+.secondary {
+  --btn-color: #000000;
+  --btn-bg: #ffd700; /* Amarillo institucional */
+  --btn-border-color: #ffd700;
+  --btn-hover-color: #ffffff;
+  --btn-hover-bg: #006633; /* Verde institucional al hover */
+  --btn-hover-border-color: #006633;
+  --btn-focus-shadow-rgb: 255, 215, 0; /* Amarillo institucional en sombra */
+  --btn-active-color: #ffffff;
+  --btn-active-bg: #004422; /* Verde más oscuro */
+  --btn-active-border-color: #004422;
+  --btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  --btn-disabled-color: #ffffff;
+  --btn-disabled-bg: #cccccc;
   --btn-disabled-border-color: #cccccc;
 }
 
@@ -85,7 +104,7 @@ button:not(:disabled) {
   flex-direction: column;
 }
 
-.input-group input {
+input {
   border: 1px solid #006633; /* Verde institucional */
   outline: none;
   padding: 10px;
@@ -98,5 +117,18 @@ button:not(:disabled) {
     0 2px 4px 0 rgb(0 0 0 / 12%);
   border-radius: 3px;
   background: #ffffff; /* Fondo blanco institucional */
-  border: 1px solid #006633; /* Borde verde institucional */
+  border: 1px solid #006633; /* Borde verde */
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-container img {
+  display: inline-block;
+  width: 100%;
+  border: 2px solid #ffd700; /* Marco amarillo institucional */
+  border-radius: 4px;
 }

@@ -2,6 +2,8 @@ const express = require('express');
 const {createServer} = require('http'); 
 const realTimeServer = require('./realTimeServer'); 
 const path = require('path'); //ruta raiz dentro de src
+const cookieParser = require("cookie-parser");
+
 
 const app = express();  //creamos la aplicacion de express, esto es lo que se va a ejecutar, es el servidor de express, es el que va a manejar las rutas, las vistas, etc
 const httpServer = createServer(app); //creamos el servidor http, le pasamos la aplicacion de express, esto es para que el servidor http pueda manejar las peticiones de express, esto es necesario para que el servidor de socket io pueda conectarse a el
@@ -12,6 +14,7 @@ app.set('port', process.env.PORT || 3000); // .env es para las variables de ento
 
 //vamos a decirle donde estan los directorios
 app.set('views',path.join(__dirname, 'views' )); //usamos el path, esto pa las vistas directamente 
+app.use(cookieParser());
 
 app.use(require("./routes")); //requiero usar una ruta, siempre busa el index.js por defecto
 
