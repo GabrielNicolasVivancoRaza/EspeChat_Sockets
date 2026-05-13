@@ -7,6 +7,36 @@ const typingIndicator = document.querySelector('#typing-indicator');
 let typingTimeout; // Para controlar el timeout de escritura
 let isTyping = false; // Bandera para saber si está escribiendo
 
+// Obtener el usuario actual de las cookies
+function getCurrentUser() {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        const [key, value] = cookie.trim().split('=');
+        if (key === 'user') {
+            return decodeURIComponent(value);
+        }
+    }
+    return 'Tú';
+}
+
+// Función para reproducir sonido de notificación
+function playNotificationSound() {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    
+    // Sonido: frecuencia 800Hz, duración 200ms
+    oscillator.frequency.value = 800;
+    gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.2);
+}
+
 send.addEventListener('click', () => {
     const message = messageInput.value.trim();
     
@@ -48,6 +78,7 @@ messageInput.addEventListener('input', () => {
 });
 
 socket.on("message", ({user, message, date}) => {
+    const currentUser = getCurrentUser();
     const msg = document.createRange().createContextualFragment(`
         <div class="message">
             <div class="image-container">
@@ -63,6 +94,12 @@ socket.on("message", ({user, message, date}) => {
         </div>
     `);
     allMessages.append(msg);
+    
+    // Reproducir sonido solo si el mensaje NO es del usuario actual
+    if (user !== currentUser) {
+        playNotificationSound();
+    }
+    
     // Auto-scroll al último mensaje
     allMessages.scrollTop = allMessages.scrollHeight;
 });
