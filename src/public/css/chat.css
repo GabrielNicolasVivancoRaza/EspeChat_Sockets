@@ -179,6 +179,18 @@ header h1 {
   white-space: nowrap;
 }
 
+.send-message button#send-photo {
+  padding: 10px 15px;
+  font-size: 18px;
+  background-color: #4CAF50;
+}
+
+.send-message button#send-photo:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 .send-message button:hover {
   background-color: #ffed4e;
   transform: translateY(-2px);
@@ -197,3 +209,45 @@ footer {
   font-size: 12px;
   border-top: 1px solid #006633;
 }
+
+/* Estilos para botones de acción en mensajes */
+.message-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.message:hover .message-actions {
+  opacity: 1;
+}
+
+.edit-btn,
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.edit-btn:hover {
+  background-color: #e8f4f8;
+  transform: scale(1.1);
+}
+
+.delete-btn:hover {
+  background-color: #ffe8e8;
+  transform: scale(1.1);
+}
+
+/* Estilos para imágenes */
+.message-body img {
+  max-width: 100%;
+  height: auto;
+}
+
