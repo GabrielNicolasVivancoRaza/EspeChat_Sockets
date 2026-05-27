@@ -1,37 +1,96 @@
+/**
+ * @file index.js
+ * @description Punto de entrada de la aplicación
+ * @author Gabriel Nicolás Vivanco Raza
+ * 
+ * ARQUITECTURA: Arquitectura en capas con separación de responsabilidades
+ * - Capa de Presentación: Express & Socket.IO
+ * - Capa de Lógica de Negocio: Services
+ * - Capa de Acceso a Datos: (Para extensión futura)
+ * 
+ * PRINCIPIOS APLICADOS:
+ * - DRY: Uso de constantes y configuración centralizada
+ * - SOLID: Separación de responsabilidades
+ * - Clean Code: Nombres descriptivos y comentarios útiles
+ */
+
 const express = require('express');
-const {createServer} = require('http'); 
-const realTimeServer = require('./realTimeServer'); 
-const path = require('path'); //ruta raiz dentro de src
-const cookieParser = require("cookie-parser");
+const { createServer } = require('http');
+const path = require('path');
+const cookieParser = require('cookie-parser');
 
+const realTimeServer = require('./realTimeServer');
+const logger = require('./utils/logger');
+const ENVIRONMENT_CONFIG = require('./config/environment');
 
-const app = express();  //creamos la aplicacion de express, esto es lo que se va a ejecutar, es el servidor de express, es el que va a manejar las rutas, las vistas, etc
-const httpServer = createServer(app); //creamos el servidor http, le pasamos la aplicacion de express, esto es para que el servidor http pueda manejar las peticiones de express, esto es necesario para que el servidor de socket io pueda conectarse a el
+// ============================================================================
+// INICIALIZACIÓN DE LA APLICACIÓN
+// ============================================================================
 
-//creamos para puerto 
-app.set('port', process.env.PORT || 3000); // .env es para las variables de entorno 
-//puerto por defecto en node es el 3000
+const app = express();
+const httpServer = createServer(app);
 
-//vamos a decirle donde estan los directorios
-app.set('views',path.join(__dirname, 'views' )); //usamos el path, esto pa las vistas directamente 
+// ============================================================================
+// CONFIGURACIÓN DE EXPRESS
+// ============================================================================
+
+// Configurar puerto desde variables de ambiente
+app.set('port', ENVIRONMENT_CONFIG.PORT);
+
+// Configurar directorio de vistas
+app.set('views', path.join(__dirname, 'views'));
+
+// ============================================================================
+// MIDDLEWARE
+// ============================================================================
+
+// Parsear cookies
 app.use(cookieParser());
 
-app.use(require("./routes")); //requiero usar una ruta, siempre busa el index.js por defecto
+// Servir archivos estáticos (CSS, JS, imágenes)
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(express.static(path.join(__dirname, 'public'))); //esto es para los archivos estaticos, como css, js, imagenes, etc
+// ============================================================================
+// RUTAS
+// ============================================================================
 
-httpServer.listen(app.get('port'), () => { //a traves del puerto que vamos a necesitar para conectarnos. funciona anomima o closure, funcion sin nombre
-    console.log('Servidor en puerto', app.get('port'));
-});
+app.use(require('./routes'));
 
-realTimeServer(httpServer); //httpserver es nuestra aplicacion que esta corriendo en el server 
+// ============================================================================
+// INICIAR SERVIDOR
+// ============================================================================
 
-//a traves de las rutas
+const startServer = () => {
+  const port = app.get('port');
+  
+  httpServer.listen(port, () => {
+    logger.info(`Servidor iniciado correctamente`, { 
+      port,
+      environment: ENVIRONMENT_CONFIG.NODE_ENV 
+    });
+  });
 
+  // Inicializar Socket.IO para comunicación en tiempo real
+  realTimeServer(httpServer);
 
+  // Manejo de errores no capturados
+  process.on('uncaughtException', (error) => {
+    logger.error('Error no capturado', { 
+      message: error.message,
+      stack: error.stack 
+    });
+    process.exit(1);
+  });
 
-//git add .
-//git commit -m "mensaje del commit"
-//git branch -m main
-//git remote add origin link del repositorio
-//git push -u origin main
+  process.on('unhandledRejection', (reason) => {
+    logger.error('Promesa rechazada no manejada', { reason });
+    process.exit(1);
+  });
+};
+
+// Iniciar el servidor
+if (require.main === module) {
+  startServer();
+}
+
+module.exports = { app, httpServer, startServer };
